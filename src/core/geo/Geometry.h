@@ -1,16 +1,22 @@
-//
-// Created by Luke Openshaw on 31/01/2026.
-//
+#pragma once
+#include <vector>
+#include <cstdint>
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
-
-
-
-class Geometry {
-
+struct Vec3
+{
+    float x = 0, y = 0, z = 0;
 };
 
+struct Tri
+{
+    uint32_t a=0, b=0, c=0;
+};
 
+struct Geometry
+{
+    std::vector<Vec3> P;      // point positions
+    std::vector<Tri>  Tris;   // triangle primitives
 
-#endif //GEOMETRY_H
+    bool empty() const { return P.empty() || Tris.empty(); }
+    void clear() { P.clear(); Tris.clear(); }
+};

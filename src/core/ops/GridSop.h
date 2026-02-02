@@ -1,16 +1,17 @@
-//
-// Created by Luke Openshaw on 02/02/2026.
-//
+#pragma once
+#include "core/graph/Node.h"
 
-#ifndef GRIDSOP_H
-#define GRIDSOP_H
+class GridSop final : public Node
+{
+public:
+    explicit GridSop(NodeId id);
 
+    const char* typeName() const override { return "Grid"; }
 
+    int rows = 20;
+    int cols = 20;
+    float size = 1.0f;
 
-class GridSop {
-
+    Geometry cook(const CookContext&,
+                  const std::vector<std::shared_ptr<const Geometry>>&) const override;
 };
-
-
-
-#endif //GRIDSOP_H

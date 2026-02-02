@@ -1,16 +1,13 @@
-//
-// Created by Luke Openshaw on 02/02/2026.
-//
+#pragma once
+#include "core/graph/Node.h"
 
-#ifndef NULLSOP_H
-#define NULLSOP_H
+class NullSop final : public Node
+{
+public:
+    explicit NullSop(NodeId id);
 
+    const char* typeName() const override { return "Null"; }
 
-
-class NullSop {
-
+    Geometry cook(const CookContext&,
+                  const std::vector<std::shared_ptr<const Geometry>>& inputs) const override;
 };
-
-
-
-#endif //NULLSOP_H

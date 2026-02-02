@@ -1,16 +1,16 @@
-//
-// Created by Luke Openshaw on 02/02/2026.
-//
+#pragma once
+#include "core/graph/Node.h"
 
-#ifndef TRANSFORMSOP_H
-#define TRANSFORMSOP_H
+class TransformSop final : public Node
+{
+public:
+    explicit TransformSop(NodeId id);
 
+    const char* typeName() const override { return "Transform"; }
 
+    Vec3 translate{0,0,0};
+    float uniformScale = 1.0f;
 
-class TransformSop {
-
+    Geometry cook(const CookContext&,
+                  const std::vector<std::shared_ptr<const Geometry>>& inputs) const override;
 };
-
-
-
-#endif //TRANSFORMSOP_H

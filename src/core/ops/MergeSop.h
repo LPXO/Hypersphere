@@ -1,16 +1,13 @@
-//
-// Created by Luke Openshaw on 02/02/2026.
-//
+#pragma once
+#include "core/graph/Node.h"
 
-#ifndef MERGESOP_H
-#define MERGESOP_H
+class MergeSop final : public Node
+{
+public:
+    explicit MergeSop(NodeId id);
 
+    const char* typeName() const override { return "Merge"; }
 
-
-class MergeSop {
-
+    Geometry cook(const CookContext&,
+                  const std::vector<std::shared_ptr<const Geometry>>& inputs) const override;
 };
-
-
-
-#endif //MERGESOP_H
