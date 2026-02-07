@@ -13,7 +13,7 @@
 class NodeGraphView final : public QGraphicsView
 {
     Q_OBJECT
-  public:
+public:
     explicit NodeGraphView(QWidget* parent = nullptr);
 
     void setGraph(Graph* g);
@@ -24,11 +24,10 @@ class NodeGraphView final : public QGraphicsView
 
     void centerOnGraph();
 
-    signals:
+signals:
     void nodeSelected(NodeId id);
     void displayNodeRequested(NodeId id);
     void graphChanged(); // connect/disconnect
-
 
 protected:
     void mousePressEvent(QMouseEvent* e) override;
@@ -77,5 +76,4 @@ private:
 
     void onNodeClicked(NodeId id);
     void onNodeDoubleClicked(NodeId id);
-
 };

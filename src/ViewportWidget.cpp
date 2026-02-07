@@ -7,6 +7,7 @@ ViewportWidget::ViewportWidget(QWidget* parent)
   : QOpenGLWidget(parent)
 {
   setFocusPolicy(Qt::StrongFocus);
+  m_showViewportGrid = true;
 }
 
 void ViewportWidget::setGraphAndCooker(Graph* g, Cooker* c)
@@ -97,6 +98,42 @@ void ViewportWidget::applySimpleCamera(int w, int h)
   glTranslatef(-eye[0], -eye[1], -eye[2]);
 }
 
+#include <QKeyEvent>
+
+void ViewportWidget::drawViewportGrid(float halfSize, float majorStep, float minorStep)
+{
+  // Grid on the XZ plane (Y=0)
+  // minor lines
+  glColor3f(0.18f, 0.18f, 0.20f);
+  glBegin(GL_LINES);
+  for (float x = -halfSize; x <= halfSize + 0.0001f; x += minorStep)
+  {
+    glVertex3f(x, 0.0f, -halfSize);
+    glVertex3f(x, 0.0f,  halfSize);
+  }
+  for (float z = -halfSize; z <= halfSize + 0.0001f; z += minorStep)
+  {
+    glVertex3f(-halfSize, 0.0f, z);
+    glVertex3f( halfSize, 0.0f, z);
+  }
+  glEnd();
+
+  // major lines
+  glColor3f(0.26f, 0.26f, 0.30f);
+  glBegin(GL_LINES);
+  for (float x = -halfSize; x <= halfSize + 0.0001f; x += majorStep)
+  {
+    glVertex3f(x, 0.0f, -halfSize);
+    glVertex3f(x, 0.0f,  halfSize);
+  }
+  for (float z = -halfSize; z <= halfSize + 0.0001f; z += majorStep)
+  {
+    glVertex3f(-halfSize, 0.0f, z);
+    glVertex3f( halfSize, 0.0f, z);
+  }
+  glEnd();
+}
+
 void ViewportWidget::paintGL()
 {
   glClearColor(0.08f, 0.08f, 0.09f, 1.0f);
@@ -111,11 +148,17 @@ void ViewportWidget::paintGL()
     glColor3f(0,0,1); glVertex3f(0,0,0); glVertex3f(0,0,1);
   glEnd();
 
+  if (m_showViewportGrid)
+    drawViewportGrid(/*halfSize*/ 10.0f, /*majorStep*/ 1.0f, /*minorStep*/ 0.2f);
+
   if (!m_graph || !m_cooker || m_displayNode == 0) return;
 
   auto geo = m_cooker->evaluate(m_displayNode);
   if (!geo || geo->empty()) return;
 
+  // Filled draw (surface)
+  glDisable(GL_CULL_FACE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glColor3f(0.85f, 0.85f, 0.9f);
   glBegin(GL_TRIANGLES);
   for (const auto& t : geo->Tris)
@@ -128,7 +171,32 @@ void ViewportWidget::paintGL()
     glVertex3f(c.x, c.y, c.z);
   }
   glEnd();
+
+  // Optional wireframe overlay (toggle)
+  if (m_showGeoWireframe)
+  {
+    glEnable(GL_POLYGON_OFFSET_LINE);
+    glPolygonOffset(-1.0f, -1.0f); // pull lines toward camera to reduce z-fighting
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glColor3f(0.05f, 0.05f, 0.06f);
+    glBegin(GL_TRIANGLES);
+    for (const auto& t : geo->Tris)
+    {
+      const auto& a = geo->P[t.a];
+      const auto& b = geo->P[t.b];
+      const auto& c = geo->P[t.c];
+      glVertex3f(a.x, a.y, a.z);
+      glVertex3f(b.x, b.y, b.z);
+      glVertex3f(c.x, c.y, c.z);
+    }
+    glEnd();
+
+    glDisable(GL_POLYGON_OFFSET_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
+
 
 void ViewportWidget::mousePressEvent(QMouseEvent* e)
 {
@@ -157,4 +225,32 @@ void ViewportWidget::wheelEvent(QWheelEvent* e)
   if (m_dist < 0.2f) m_dist = 0.2f;
   if (m_dist > 50.0f) m_dist = 50.0f;
   update();
+}
+void ViewportWidget::setShowViewportGrid(bool on)
+{
+  m_showViewportGrid = on;
+  update();
+}
+
+void ViewportWidget::setShowGeoWireframe(bool on)
+{
+  m_showGeoWireframe = on;
+  update();
+}
+
+void ViewportWidget::keyPressEvent(QKeyEvent* e)
+{
+  if (e->key() == Qt::Key_G)
+  {
+    m_showViewportGrid = !m_showViewportGrid;
+    update();
+    return;
+  }
+  if (e->key() == Qt::Key_W)
+  {
+    m_showGeoWireframe = !m_showGeoWireframe;
+    update();
+    return;
+  }
+  QOpenGLWidget::keyPressEvent(e);
 }

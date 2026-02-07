@@ -35,5 +35,13 @@ private:
     float m_dist = 3.0f;
     QPoint m_lastMouse;
 
+    bool m_showGeoWireframe;
+    bool m_showViewportGrid;
+
     void applySimpleCamera(int w, int h);
+    void drawViewportGrid(float halfSize, float majorStep, float minorStep);
+
+    void setShowViewportGrid(bool on);
+    void setShowGeoWireframe(bool on);
+    void keyPressEvent(QKeyEvent* e) override;
 };

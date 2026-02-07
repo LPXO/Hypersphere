@@ -122,12 +122,10 @@ void NodeGraphView::setDisplayNode(NodeId id)
 
 void NodeGraphView::setSelectedNode(NodeId id)
 {
-  auto it = m_nodeItems.find(id);
-  if (it != m_nodeItems.end())
-  {
-    it->second->setSelected(true);
-    centerOn(it->second);
-  }
+  // Normal selection should NOT move the camera/view.
+  // Also ensure only one node is selected at a time.
+  for (auto& kv : m_nodeItems)
+    kv.second->setSelected(kv.first == id);
 }
 
 void NodeGraphView::centerOnGraph()
@@ -211,6 +209,10 @@ void NodeGraphView::onNodeClicked(NodeId id)
 void NodeGraphView::onNodeDoubleClicked(NodeId id)
 {
   emit displayNodeRequested(id);
+  // Optional: focus the view on the display node (Houdini-ish)
+  auto it = m_nodeItems.find(id);
+  if (it != m_nodeItems.end())
+    centerOn(it->second);
 }
 
 void NodeGraphView::mousePressEvent(QMouseEvent* e)
