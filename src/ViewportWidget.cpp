@@ -1,5 +1,4 @@
 #include "ViewportWidget.h"
-#include <QMouseEvent>
 #include <QWheelEvent>
 #include <cmath>
 
@@ -8,6 +7,10 @@ ViewportWidget::ViewportWidget(QWidget* parent)
 {
   setFocusPolicy(Qt::StrongFocus);
   m_showViewportGrid = true;
+
+  m_yaw   = 50.0f;
+  m_pitch = 20.0f;   // +Y side (avoid 90° singularity)
+  m_dist  = 3.0f;
 }
 
 void ViewportWidget::setGraphAndCooker(Graph* g, Cooker* c)

@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "ViewportWidget.h"
 #include "ParamPanel.h"
@@ -23,25 +24,33 @@ MainWindow::MainWindow()
 {
   setupRegistry();
 
-  auto* splitter = new QSplitter(this);
+  // Layout: viewport on the left, graph + params stacked on the right
+  auto* splitter = new QSplitter(Qt::Horizontal, this);
 
-  m_graphView = new NodeGraphView(splitter);
-  m_graphView->setMinimumWidth(360);
-  m_graphView->setGraph(&m_graph);
-
-  // center viewport
+  // left viewport
   m_viewport = new ViewportWidget(splitter);
-  m_viewport->setMinimumWidth(360);
+  m_viewport->setMinimumWidth(250);
   m_viewport->setGraphAndCooker(&m_graph, &m_cooker);
 
-  // right params
-  m_params = new ParamPanel(splitter);
-  m_params->setMinimumWidth(260);
+  // right side: vertical stack (params on top)
+  auto* rightSplitter = new QSplitter(Qt::Vertical, splitter);
+
+  m_params = new ParamPanel(rightSplitter);
+  m_params->setMinimumHeight(250);
   m_params->setGraphAndCooker(&m_graph, &m_cooker);
 
-  splitter->setStretchFactor(0, 0);
-  splitter->setStretchFactor(1, 1);
-  splitter->setStretchFactor(2, 0);
+  m_graphView = new NodeGraphView(rightSplitter);
+  m_params->setMinimumHeight(250);
+  m_graphView->setGraph(&m_graph);
+
+
+
+  // proportions
+  splitter->setStretchFactor(0, 1); // viewport grows
+  splitter->setStretchFactor(1, 0); // right stack keeps width
+
+  rightSplitter->setStretchFactor(0, 0); // params grows vertically
+  rightSplitter->setStretchFactor(1, 0); // graph grows vertically
 
   setCentralWidget(splitter);
 
@@ -102,6 +111,10 @@ MainWindow::MainWindow()
   setDisplay(m_displayNode);
 
   setWindowTitle("Hypersphere");
+  // macOS: maximize after the window is actually shown (constructor is too early)
+  QTimer::singleShot(0, this, [this]() {
+    this->showMaximized();
+  });
 }
 
 void MainWindow::setupRegistry()
@@ -145,7 +158,11 @@ void MainWindow::buildInitialGraph()
 
   // The view is rebuilt during spawn(), but connections are added *after* spawns.
   // Rebuild again so ConnectionItem visuals match the model graph.
-  if (m_graphView) m_graphView->rebuildFromGraph();
+  if (m_graphView)
+  {
+    m_graphView->rebuildFromGraph();
+    m_graphView->centerOnGraph();
+  }
   m_cooker.clearCache();
   if (m_viewport) m_viewport->update();
 
