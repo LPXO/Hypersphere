@@ -7,6 +7,7 @@ ConnectionItem::ConnectionItem(QGraphicsItem* parent)
 {
     QPen p;
     p.setWidthF(2.0);
+    p.setColor(Qt::gray);
     setPen(p);
     setZValue(-1.0); // behind nodes
 }

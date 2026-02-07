@@ -10,6 +10,8 @@ NodeItem::NodeItem(NodeId id, QString title, int inputCount, QGraphicsItem* pare
 {
   setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
   setAcceptHoverEvents(true);
+  setFlag(QGraphicsItem::ItemIsMovable, true);
+  setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 }
 
 QRectF NodeItem::boundingRect() const { return m_rect.adjusted(-2, -2, 2, 2); }
@@ -108,5 +110,16 @@ void NodeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* e)
 {
   e->accept();              // ⬅️ prevent move/drag
   emit doubleClicked(m_id);
+}
+
+QVariant NodeItem::itemChange(GraphicsItemChange change,
+                              const QVariant& value)
+{
+  if (change == QGraphicsItem::ItemPositionHasChanged)
+  {
+    emit moved(m_id);
+  }
+
+  return QGraphicsObject::itemChange(change, value);
 }
 

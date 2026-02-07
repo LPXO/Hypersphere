@@ -76,4 +76,6 @@ private:
 
     void onNodeClicked(NodeId id);
     void onNodeDoubleClicked(NodeId id);
+
+    void updateAllConnectionEndpoints();
 };

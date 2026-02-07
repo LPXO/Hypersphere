@@ -62,6 +62,9 @@ void NodeGraphView::rebuildFromGraph()
 
     connect(item, &NodeItem::clicked, this, &NodeGraphView::onNodeClicked);
     connect(item, &NodeItem::doubleClicked, this, &NodeGraphView::onNodeDoubleClicked);
+    connect(item, &NodeItem::moved, this, [this](NodeId){
+      updateAllConnectionEndpoints();
+    });
 
     m_nodeItems[id] = item;
     ++i;
@@ -103,7 +106,35 @@ void NodeGraphView::rebuildConnections()
       m_connections[{dst, inputIndex}] = conn;
     }
   }
+
+  updateAllConnectionEndpoints();
 }
+
+void NodeGraphView::updateAllConnectionEndpoints()
+{
+  if (!m_graph) return;
+
+  for (auto& kv : m_connections)
+  {
+    const ConnKey key = kv.first;
+    ConnectionItem* conn = kv.second;
+    if (!conn) continue;
+
+    auto* dstItem = m_nodeItems[key.dst];
+    if (!dstItem) continue;
+
+    const auto inputs = m_graph->inputsOf(key.dst);
+    if (key.input < 0 || key.input >= (int)inputs.size()) continue;
+
+    const NodeId srcId = inputs[(size_t)key.input];
+    auto* srcItem = m_nodeItems[srcId];
+    if (!srcItem) continue;
+
+    conn->setEndpoints(srcItem->outputSocketScenePos(),
+                       dstItem->inputSocketScenePos(key.input));
+  }
+}
+
 
 NodeItem* NodeGraphView::itemAtScene(const QPointF& scenePos) const
 {

@@ -27,12 +27,15 @@ class NodeItem final : public QGraphicsObject
     bool isDisplay() const { return m_isDisplay; }
 
     signals:
-      void clicked(NodeId id);
+    void clicked(NodeId id);
     void doubleClicked(NodeId id);
+    void moved(NodeId id);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* e) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* e) override;
+    QVariant itemChange(GraphicsItemChange change,
+                              const QVariant& value) override;
 
 private:
     NodeId m_id;
