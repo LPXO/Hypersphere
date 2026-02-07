@@ -143,6 +143,13 @@ void MainWindow::buildInitialGraph()
   // wire: xform -> null input0
   m_graph.connect(xf, out, 0);
 
+  // The view is rebuilt during spawn(), but connections are added *after* spawns.
+  // Rebuild again so ConnectionItem visuals match the model graph.
+  if (m_graphView) m_graphView->rebuildFromGraph();
+  m_cooker.clearCache();
+  if (m_viewport) m_viewport->update();
+
+
   m_displayNode = out;
 }
 
