@@ -53,6 +53,15 @@ add_executable(hypersphere
         src/ParamPanel.h
         src/MainWindow.cpp
         src/MainWindow.h
+        src/ui/ConnectionItem.cpp
+        src/ui/ConnectionItem.h
+        src/ui/NodeItem.cpp
+        src/ui/NodeItem.h
+        src/ui/NodeGraphView.cpp
+        src/ui/NodeGraphView.h
+        src/ui/NodeGraphView.h src/ui/NodeGraphView.cpp
+        src/ui/NodeItem.h src/ui/NodeItem.cpp
+        src/ui/ConnectionItem.h src/ui/ConnectionItem.cpp
 )
 
 target_include_directories(hypersphere PRIVATE src)

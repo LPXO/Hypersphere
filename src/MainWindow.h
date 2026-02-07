@@ -8,6 +8,7 @@
 class QListWidget;
 class ViewportWidget;
 class ParamPanel;
+class NodeGraphView;
 
 class MainWindow final : public QMainWindow
 {
@@ -24,7 +25,7 @@ private:
     NodeId m_selectedNode = 0;
     NodeId m_nextId = 1;
 
-    QListWidget* m_nodeList = nullptr;
+    NodeGraphView* m_graphView = nullptr;
     ViewportWidget* m_viewport = nullptr;
     ParamPanel* m_params = nullptr;
 
@@ -32,7 +33,6 @@ private:
     void buildInitialGraph();
     NodeId spawn(const std::string& type);
 
-    void rebuildNodeList();
     void setSelected(NodeId id);
     void setDisplay(NodeId id);
 };
